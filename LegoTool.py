@@ -4,36 +4,34 @@ mc.select(all=True)
 mc.delete()
 
 # Brick constants 
-studHeight = 0.17
-studWidth = 0.8
+unitHeight = 0.17
+unitWidth = 0.8
 thickness = 0.12
 
 # User defined parameters 
 flat = True
 userLength = 4
 userWidth = 2
-height = None
+height = 0.32
 
+# Calculate dimensions 
+if not flat:
+    height = 3 * height
 
-if flat:
-    height = .32
-else:
-    height = .96
+width = userWidth * unitWidth
+length = userLength * unitWidth
 
-width = userWidth * studWidth
-length = userLength * studWidth
-
+# Create base 
 base = mc.polyCube(w=width, d=length, h=height)[0]
 mc.move(0, height/2, 0)
-print("length: ", length)
-print("width: ", width)
 
+# Create studs 
 for i in range(userLength):
     for j in range(userWidth):
-        mc.polyCylinder(r=.24, h=studHeight, sx=12)
-        mc.move(-width/2 + studWidth/2 + studWidth*j, height + (studHeight)/2, -length/2 + studWidth/2 + studWidth * i)
+        mc.polyCylinder(r=.24, h=unitHeight, sx=12)
+        mc.move(-width/2 + unitWidth/2 + unitWidth*j, height + (unitHeight)/2, -length/2 + unitWidth/2 + unitWidth * i)
 
-
+# Bottom boolean 
 bool = mc.polyCube(w=width - 2*thickness, d=length - 2*thickness, h=height-thickness)[0]
 mc.move(0, (height/2) - thickness/2, 0)
 mc.polyCBoolOp(base, bool, op=2)
