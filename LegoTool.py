@@ -1,5 +1,20 @@
 import maya.cmds as mc
 
+class LegoTool(object):
+    
+    def __init__(self):
+        
+        self.window = "Lego Tool"
+        self.title = "Lego Tool" 
+        self.size = (400, 400)
+        
+        if mc.window(self.window, exists = True):
+            mc.deleteUI(self.window, window=True)
+            
+        self.window = mc.window(self.window, title=self.title, widthHeight=self.size)
+        
+        mc.showWindow()
+
 def deleteAll():
     mc.select(all=True)
     mc.delete()
@@ -29,8 +44,6 @@ def createLego(uLength = 4, uWidth = 2, fl = False):
     # Create base 
     base = mc.polyCube(w=width, d=length, h=height)[0]
     mc.move(0, height/2, 0)
-    
-    brick = []
     
     # Create top studs 
     for i in range(userLength):
@@ -68,4 +81,12 @@ def createLego(uLength = 4, uWidth = 2, fl = False):
 
 # deleteAll()
 createLego(2, 3)
+
+legoTool = LegoTool()
+
+
+
+
+
+
 
