@@ -60,6 +60,7 @@ def createLego(uLength = 4, uWidth = 2, fl = False):
     brick.append(base[0])
     
     # Create underside studs 
+    # FIXME: This only works in one direction 
     for i in range(userLength - 1):
         rad = 0.325
         if userLength == 1 or userWidth == 1:
