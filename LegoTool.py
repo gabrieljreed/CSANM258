@@ -76,6 +76,8 @@ def createLego(uLength = 4, uWidth = 2, fl = False):
             mc.move(-width/2 + j*unitWidth + unitWidth, (height-thickness)/2, -length/2 + i*unitWidth + unitWidth)
 
     name = "Brick_" + str(userLength) + "x" + str(userWidth) + "_0"
+    if flat:
+        name += "_flat"
     print(name)
     mc.group(brick, n=name)
 
