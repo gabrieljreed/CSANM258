@@ -157,42 +157,51 @@ legoTool = LegoTool()
 
 legoTool.deleteAll()
 
-"""
-for j in range(4):
-    for i in range(4):
-        legoTool.createLegoBrick(1, 1)
-        mc.move(j*0.8*4, .96*i, 0)
-"""
 
 
 # Fence 
 fence = []
 slat=None
+length = 19
 
-for i in range(4):
-    slat = legoTool.createLegoBrick(5, 1, True)
-    mc.move(i*0.8*2 - 0.8*3, 0, 0.8)
-    fence.append(slat)
+numSlats = length//2
+for i in range(numSlats):
+    j = random.uniform(0, 1)
+    if j > 0.5 or i == 0 or i == numSlats-1:
+        slat = legoTool.createLegoBrick(5, 1, True)
+        mc.move(i*0.8*2 - 0.8*(numSlats - 1), 0, 0.8)
+        fence.append(slat)
 
-board = legoTool.createLegoBrick(1, 9, True)
+board = legoTool.createLegoBrick(1, length, True)
 mc.move(0, 0.32, 0)
 fence.append(board)
 
-board2 = legoTool.createLegoBrick(1, 9, True)
+board2 = legoTool.createLegoBrick(1, length, True)
 mc.move(0, 0.32, 0.8*2)
 fence.append(board2)
 
-numStuds = int(random.uniform(3, 7))
-print(numStuds)
+numStuds = int(random.uniform(3, length))
 
 for i in range(numStuds):
     stud = legoTool.createLegoCylinder(True)
-    mc.move(i*0.8, 0.64, 0.8*2)
+    j = random.uniform(0,1)
+    z=0
+    if j > 0.5:
+        z=0.8*2
+    x = int(random.uniform(0, length))
+    mc.move(x*0.8 - 0.8*(numSlats), 0.64, z)
     fence.append(stud)
 
 mc.group(fence, n="Fence")
-mc.rotate("-90deg", 0, 0)
-mc.move(0, 1.6, 0)
+#mc.rotate("-90deg", 0, 0)
+mc.move(10, 1.6, 17)
+mc.rotate(-90, 20, 0, r=True)
+
+
+
+
+
+
 
 
 for i in range(16):
