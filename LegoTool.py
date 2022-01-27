@@ -1,7 +1,11 @@
 import maya.cmds as mc
-
+import random
 
 class LegoTool:
+    def __init__(self):
+        self.numBricks = 0
+        self.numCylinders = 0
+    
     def deleteAll(self):
         mc.select(all=True)
         mc.delete()
@@ -29,6 +33,7 @@ class LegoTool:
 
         # Create base
         base = mc.polyCube(w=width, d=length, h=height)[0]
+        mc.polyBevel(o=0.02)
         mc.move(0, height / 2, 0)
 
         # Create top studs
@@ -62,33 +67,64 @@ class LegoTool:
                 mc.move(-width / 2 + j * unitWidth + unitWidth, (height - thickness) / 2,
                         -length / 2 + i * unitWidth + unitWidth)
 
-        name = "Brick_" + str(userLength) + "x" + str(userWidth) + "_0"
+        name = "Brick_" + str(userLength) + "x" + str(userWidth) + "_" + str(self.numBricks)
         if flat:
             name += "_flat"
-        print(name)
         mc.group(brick, n=name)
+        self.numBricks += 1
+        return name
 
 
     def createLegoCylinder(self, flat=False):
+        brick = []
+        
         unitHeight = 0.17
-
-        height = 0.32
-        if not flat:
-            height = 3 * height
         baseHeight = 0.762
         totalHeight = 0.96
+        if flat:
+            baseHeight = 0.1
+            totalHeight = 0.3
 
         # Create base
-        mc.polyCylinder(h=baseHeight, r=0.38)
-        mc.move(0, totalHeight/2, 0)
+        cylinderBase = mc.polyCylinder(h=baseHeight, r=0.38, sx=12)[0]
+        mc.move(0, totalHeight/2 + (totalHeight-baseHeight)/8, 0)
+        
+        # Bottom thing
+        if flat:
+            baseHeight *= 2
+        cylinderBool = mc.polyCylinder(r=0.3, h=baseHeight, sx=12)
+        mc.move(0, baseHeight/2, 0)
+        cylinderBase = mc.polyCBoolOp(cylinderBase, cylinderBool, op=2)
+        mc.delete(ch=1)
+        brick.append(cylinderBase[0])
+        
+        bottomBase = mc.polyCylinder(r=0.3, h=baseHeight, sx=12)
+        mc.move(0, baseHeight/2, 0)
+        bottomBool = mc.polyCylinder(r=0.24, h=baseHeight, sx=12)
+        mc.move(0, baseHeight/2, 0)
+        bottomBase = mc.polyCBoolOp(bottomBase, bottomBool, op=2)
+        mc.delete(ch=1)
+        brick.append(bottomBase[0])
+        
 
         # Create top stud
-        mc.polyCylinder(r=0.24, h=unitHeight)
-        mc.move(0, totalHeight + (unitHeight) / 2, 0)
+        studBase = mc.polyCylinder(r=0.24, h=unitHeight, sx=12)[0]
+        mc.move(0, totalHeight, 0)
+        if not flat:
+            studBool = mc.polyCylinder(r=0.16, h=unitHeight, sx=12)[0]
+            mc.move(0, totalHeight, 0)
+            studBase = mc.polyCBoolOp(studBase, studBool, op=2)[0]
+            mc.delete(ch=1)
+        brick.append(studBase)
+        
+        name = "Cylinder_" + str(self.numCylinders)
+        if flat:
+            name="Stud_" + str(self.numCylinders)
+        mc.group(brick, n=name)
+        self.numCylinders += 1
+        return name
 
-        # Bottom thing
-        mc.polyCylinder(r=0.28, h=baseHeight)
-        mc.move(0, baseHeight/2, 0)
+        
 
 
 class LegoToolWindow(object):
@@ -120,6 +156,82 @@ class LegoToolWindow(object):
 legoTool = LegoTool()
 
 legoTool.deleteAll()
-legoTool.createLegoBrick(2, 2)
-mc.move(-2, 0, -2)
-legoTool.createLegoCylinder()
+
+"""
+for j in range(4):
+    for i in range(4):
+        legoTool.createLegoBrick(1, 1)
+        mc.move(j*0.8*4, .96*i, 0)
+"""
+
+
+# Fence 
+fence = []
+slat=None
+
+for i in range(4):
+    slat = legoTool.createLegoBrick(5, 1, True)
+    mc.move(i*0.8*2 - 0.8*3, 0, 0.8)
+    fence.append(slat)
+
+board = legoTool.createLegoBrick(1, 9, True)
+mc.move(0, 0.32, 0)
+fence.append(board)
+
+board2 = legoTool.createLegoBrick(1, 9, True)
+mc.move(0, 0.32, 0.8*2)
+fence.append(board2)
+
+numStuds = int(random.uniform(3, 7))
+print(numStuds)
+
+for i in range(numStuds):
+    stud = legoTool.createLegoCylinder(True)
+    mc.move(i*0.8, 0.64, 0.8*2)
+    fence.append(stud)
+
+mc.group(fence, n="Fence")
+mc.rotate("-90deg", 0, 0)
+mc.move(0, 1.6, 0)
+
+
+for i in range(16):
+    legoTool.createLegoBrick(10, 2, True)
+    mc.move(0.8*4*i - 0.4*11, 0, 0)
+    
+    legoTool.createLegoBrick(1, 2, True)
+    mc.move(0.8*4*i - 0.4*11, 0.32, + 0.4 + 0.8*3)
+    
+    legoTool.createLegoBrick(1, 2, True)
+    mc.move(0.8*4*i - 0.4*11, 0.32, - (0.4 + 0.8*3))
+    
+    legoTool.createLegoCylinder(True)
+    mc.move(0.8*4*i - 0.4*11 + 0.4, 0.32, + 0.4 + 0.8*1)
+    
+    legoTool.createLegoCylinder(True)
+    mc.move(0.8*4*i - 0.4*11 - 0.4, 0.32, + 0.4 + 0.8*1)
+    
+    legoTool.createLegoCylinder(True)
+    mc.move(0.8*4*i - 0.4*11 + 0.4, 0.32, - 0.4 - 0.8*1)
+    
+    legoTool.createLegoCylinder(True)
+    mc.move(0.8*4*i - 0.4*11 - 0.4, 0.32, - 0.4 - 0.8*1)
+
+for i in range(5):
+    length = 12
+    legoTool.createLegoBrick(1, length)
+    mc.move(0.4 + length*0.8*i, 0.32, -0.4 - 0.8*2)
+    
+    legoTool.createLegoBrick(1, length)
+    mc.move(0.4 + length*0.8*i, 0.32,  0.4 + 0.8*2)
+    
+
+
+
+
+
+
+
+
+
+
