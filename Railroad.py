@@ -77,12 +77,17 @@ class LegoTool:
         unitHeight = 0.17
         baseHeight = 0.762
         totalHeight = 0.96
+        if flat:
+            baseHeight = 0.1
+            totalHeight = 0.3
 
         # Create base
         cylinderBase = mc.polyCylinder(h=baseHeight, r=0.38)[0]
         mc.move(0, totalHeight/2 + (totalHeight-baseHeight)/8, 0)
         
         # Bottom thing
+        if flat:
+            baseHeight *= 2
         cylinderBool = mc.polyCylinder(r=0.3, h=baseHeight)
         mc.move(0, baseHeight/2, 0)
         cylinderBase = mc.polyCBoolOp(cylinderBase, cylinderBool, op=2)
@@ -104,11 +109,13 @@ class LegoTool:
         if not flat:
             studBool = mc.polyCylinder(r=0.16, h=unitHeight)[0]
             mc.move(0, totalHeight, 0)
-            studBase = mc.polyCBoolOp(studBase, studBool, op=2)
+            studBase = mc.polyCBoolOp(studBase, studBool, op=2)[0]
             mc.delete(ch=1)
-        brick.append(studBase[0])
+        brick.append(studBase)
         
         name = "Cylinder_0"
+        if flat:
+            name="Stud_0"
         mc.group(brick, n=name)
 
         
