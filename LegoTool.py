@@ -17,12 +17,22 @@ class LegoTool:
         thickness = 0.12
 
         brick = []
+        
+        
 
         # User defined parameters
         flat = fl
         userLength = uLength
         userWidth = uWidth
         height = 0.32
+        flipped = False
+        
+        if userLength == 1:
+            # flip width and length 
+            temp = userLength
+            userLength = userWidth
+            userWidth = temp
+            flipped=True
 
         # Calculate dimensions
         if not flat:
@@ -35,6 +45,8 @@ class LegoTool:
         base = mc.polyCube(w=width, d=length, h=height)[0]
         mc.polyBevel(o=0.02)
         mc.move(0, height / 2, 0)
+        
+        # FIXME: Create canSeeTop/canSeeBottom to optimize
 
         # Create top studs
         for i in range(userLength):
@@ -51,7 +63,6 @@ class LegoTool:
         brick.append(base[0])
 
         # Create underside studs
-        # FIXME: This only works in one direction
         for i in range(userLength - 1):
             rad = 0.325
             if userLength == 1 or userWidth == 1:
@@ -71,6 +82,8 @@ class LegoTool:
         if flat:
             name += "_flat"
         mc.group(brick, n=name)
+        if flipped:
+            mc.rotate(0, 90, 0, r=True)
         self.numBricks += 1
         return name
 
@@ -124,7 +137,79 @@ class LegoTool:
         self.numCylinders += 1
         return name
 
+    
+    def createTracks(self):
+        for i in range(16):
+            self.createLegoBrick(10, 2, True)
+            mc.move(0.8*4*i - 0.4*11, 0, 0)
+            
+            self.createLegoBrick(1, 2, True)
+            mc.move(0.8*4*i - 0.4*11, 0.32, + 0.4 + 0.8*3)
+            
+            self.createLegoBrick(1, 2, True)
+            mc.move(0.8*4*i - 0.4*11, 0.32, - (0.4 + 0.8*3))
+            
+            self.createLegoCylinder(True)
+            mc.move(0.8*4*i - 0.4*11 + 0.4, 0.32, + 0.4 + 0.8*1)
+            
+            self.createLegoCylinder(True)
+            mc.move(0.8*4*i - 0.4*11 - 0.4, 0.32, + 0.4 + 0.8*1)
+            
+            self.createLegoCylinder(True)
+            mc.move(0.8*4*i - 0.4*11 + 0.4, 0.32, - 0.4 - 0.8*1)
+            
+            self.createLegoCylinder(True)
+            mc.move(0.8*4*i - 0.4*11 - 0.4, 0.32, - 0.4 - 0.8*1)
+
+        for i in range(5):
+            length = 12
+            self.createLegoBrick(1, length)
+            mc.move(0.4 + length*0.8*i, 0.32, -0.4 - 0.8*2)
+            
+            self.createLegoBrick(1, length)
+            mc.move(0.4 + length*0.8*i, 0.32,  0.4 + 0.8*2)
+    
+    
+    
+    def createFence(self, length=9):
+        fence = []
+        slat=None
         
+        # Create slats 
+        numSlats = length//2
+        for i in range(numSlats):
+            j = random.uniform(0, 1)
+            if j > 0.3 or i == 0 or i == numSlats-1:
+                slat = self.createLegoBrick(5, 1, True)
+                mc.move(i*0.8*2 - 0.8*(numSlats - 1), 0, 0.8)
+                fence.append(slat)
+        
+        # Create back boards 
+        board = self.createLegoBrick(1, length, True)
+        mc.move(0, 0.32, 0)
+        fence.append(board)
+        
+        board2 = self.createLegoBrick(1, length, True)
+        mc.move(0, 0.32, 0.8*2)
+        fence.append(board2)
+        
+        # Create random studs 
+        numStuds = int(random.uniform(length*0.3, length))
+        
+        for i in range(numStuds):
+            stud = self.createLegoCylinder(True)
+            j = random.uniform(0,1)
+            z=0
+            if j > 0.5:
+                z=0.8*2
+            x = int(random.uniform(0, length))
+            mc.move(x*0.8 - 0.8*(numSlats), 0.64, z)
+            fence.append(stud)
+        
+        # Group
+        mc.group(fence, n="Fence")
+        mc.move(10, 1.6, 17)
+        mc.rotate(-90, 20, 0, r=True)
 
 
 class LegoToolWindow(object):
@@ -158,89 +243,4 @@ legoTool = LegoTool()
 legoTool.deleteAll()
 
 
-
-# Fence 
-fence = []
-slat=None
-length = 19
-
-numSlats = length//2
-for i in range(numSlats):
-    j = random.uniform(0, 1)
-    if j > 0.5 or i == 0 or i == numSlats-1:
-        slat = legoTool.createLegoBrick(5, 1, True)
-        mc.move(i*0.8*2 - 0.8*(numSlats - 1), 0, 0.8)
-        fence.append(slat)
-
-board = legoTool.createLegoBrick(1, length, True)
-mc.move(0, 0.32, 0)
-fence.append(board)
-
-board2 = legoTool.createLegoBrick(1, length, True)
-mc.move(0, 0.32, 0.8*2)
-fence.append(board2)
-
-numStuds = int(random.uniform(3, length))
-
-for i in range(numStuds):
-    stud = legoTool.createLegoCylinder(True)
-    j = random.uniform(0,1)
-    z=0
-    if j > 0.5:
-        z=0.8*2
-    x = int(random.uniform(0, length))
-    mc.move(x*0.8 - 0.8*(numSlats), 0.64, z)
-    fence.append(stud)
-
-mc.group(fence, n="Fence")
-#mc.rotate("-90deg", 0, 0)
-mc.move(10, 1.6, 17)
-mc.rotate(-90, 20, 0, r=True)
-
-
-
-
-
-
-
-
-for i in range(16):
-    legoTool.createLegoBrick(10, 2, True)
-    mc.move(0.8*4*i - 0.4*11, 0, 0)
-    
-    legoTool.createLegoBrick(1, 2, True)
-    mc.move(0.8*4*i - 0.4*11, 0.32, + 0.4 + 0.8*3)
-    
-    legoTool.createLegoBrick(1, 2, True)
-    mc.move(0.8*4*i - 0.4*11, 0.32, - (0.4 + 0.8*3))
-    
-    legoTool.createLegoCylinder(True)
-    mc.move(0.8*4*i - 0.4*11 + 0.4, 0.32, + 0.4 + 0.8*1)
-    
-    legoTool.createLegoCylinder(True)
-    mc.move(0.8*4*i - 0.4*11 - 0.4, 0.32, + 0.4 + 0.8*1)
-    
-    legoTool.createLegoCylinder(True)
-    mc.move(0.8*4*i - 0.4*11 + 0.4, 0.32, - 0.4 - 0.8*1)
-    
-    legoTool.createLegoCylinder(True)
-    mc.move(0.8*4*i - 0.4*11 - 0.4, 0.32, - 0.4 - 0.8*1)
-
-for i in range(5):
-    length = 12
-    legoTool.createLegoBrick(1, length)
-    mc.move(0.4 + length*0.8*i, 0.32, -0.4 - 0.8*2)
-    
-    legoTool.createLegoBrick(1, length)
-    mc.move(0.4 + length*0.8*i, 0.32,  0.4 + 0.8*2)
-    
-
-
-
-
-
-
-
-
-
-
+legoTool.createLegoBrick(2,6)
