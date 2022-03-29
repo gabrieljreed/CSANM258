@@ -169,6 +169,10 @@ class LegoTool:
         return name
 
     
+    def moveLego(self, x=0, y=0, z=0, flat=False):
+        mc.move(x*0.8, y*0.96, z*0.8) 
+    
+    
     def createTracks(self, length=5):
         tracks = []
         
@@ -261,5 +265,110 @@ class LegoTool:
 
 legoTool = LegoTool()
 legoTool.deleteAll()
-legoTool.createTracks(length=4)
-legoTool.createFence(length=15)
+# legoTool.createTracks(length=1)
+
+# Train car 
+# Baseplate 
+legoTool.createLegoBrick(10, 20, bottom=False, flat=True)
+legoTool.moveLego(0, 2/3, 0)
+
+# Walls 
+legoTool.createLegoBrick(1, 16, bottom=False, top=False)
+legoTool.moveLego(0, 1, 4.5)
+legoTool.createLegoBrick(1, 16, bottom=False, top=False)
+legoTool.moveLego(0, 1, -4.5)
+
+legoTool.createLegoBrick(3, 1, bottom=False, top=False)
+legoTool.moveLego(7.5, 1, 2.5)
+legoTool.createLegoBrick(3, 1, bottom=False, top=False)
+legoTool.moveLego(7.5, 1, -2.5)
+legoTool.createLegoBrick(3, 1, bottom=False, top=False)
+legoTool.moveLego(-7.5, 1, -2.5)
+legoTool.createLegoBrick(3, 1, bottom=False, top=False)
+legoTool.moveLego(-7.5, 1, 2.5)
+
+legoTool.createLegoBrick(4, 1, bottom=False, top=False)
+legoTool.moveLego(7.5, 2, 3)
+legoTool.createLegoBrick(4, 1, bottom=False, top=False)
+legoTool.moveLego(7.5, 2, -3)
+legoTool.createLegoBrick(4, 1, bottom=False, top=False)
+legoTool.moveLego(-7.5, 2, 3)
+legoTool.createLegoBrick(4, 1, bottom=False, top=False)
+legoTool.moveLego(-7.5, 2, -3)
+
+legoTool.createLegoBrick(1, 14, bottom=False, top=False)
+legoTool.moveLego(0, 2, 4.5)
+legoTool.createLegoBrick(1, 14, bottom=False, top=False)
+legoTool.moveLego(0, 2, -4.5)
+
+# Sides 
+for i in range(2):
+    side = 1
+    if i == 0:
+        side = -1
+    legoTool.createLegoBrick(1, 12)
+    legoTool.moveLego(0, 1, 3.5 * side)
+    legoTool.createLegoBrick(1, 12)
+    legoTool.moveLego(0, 2, 3.5 * side)
+
+
+for j in range(2):
+    side = 1
+    if j == 0:
+        side = -1
+
+    legoTool.createLegoBrick(1, 12, top=False, bottom=False)
+    legoTool.moveLego(0, 5, 3.5 * side)
+    
+    for i in range(2):
+        legoTool.createLegoBrick(1, 2, top=False, bottom=False)
+        legoTool.moveLego(2, i+3, 3.5 * side)
+        
+        legoTool.createLegoBrick(1, 2, top=False, bottom=False)
+        legoTool.moveLego(-2, i+3, 3.5 * side)
+
+# Front and back 
+for i in range(2):
+    side = 1
+    if i == 0:
+        side = -1
+    legoTool.createLegoBrick(8, 1, top=False)
+    legoTool.moveLego(6.5 * side, 5, 0)
+
+for j in range(4):
+    long = 1
+    if j % 2 == 0:
+        long = -1
+    wide = 1
+    if j < 2:
+        wide = -1
+
+    for i in range(4):
+        if i < 2:
+            legoTool.createLegoBrick(3, 1, top=True, bottom=False)
+            legoTool.moveLego(6.5 * long, i+1, 2.5 * wide)
+        else:
+            legoTool.createLegoBrick(1, 2, top=False, bottom=False)
+            legoTool.moveLego(6 * long, i+1, 3.5 * wide)
+            legoTool.createLegoBrick(1, 1, top=False, bottom=False)
+            legoTool.moveLego(6.5 * long, i+1, 1.5 * wide)
+
+# Roof 
+legoTool.createLegoBrick(10, 18, flat=True)
+legoTool.moveLego(0, 6, 0)
+
+legoTool.createLegoBrick(2, 10)
+legoTool.moveLego(0, 6 + 1/3, 0)
+
+legoTool.createLegoBrick(1, 16, flat=True, top=False, bottom=False)
+legoTool.moveLego(0, 6 + 1/3, 4.5)
+legoTool.createLegoBrick(1, 16, flat=True, top=False, bottom=False)
+legoTool.moveLego(0, 6 + 1/3, -4.5)
+legoTool.createLegoBrick(10, 1, flat=True, top=False, bottom=False)
+legoTool.moveLego(8.5, 6+1/3, 0)
+legoTool.createLegoBrick(10, 1, flat=True, top=False, bottom=False)
+legoTool.moveLego(-8.5, 6+1/3, 0)
+
+for i in range(5):
+    legoTool.createLegoCylinder(flat=True, bottom=False)
+    legoTool.moveLego(2*i-4, 7 + 1/3, 0)
